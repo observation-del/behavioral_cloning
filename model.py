@@ -14,14 +14,31 @@ with open('./data/driving_log.csv') as csvfile:
 images = []
 measurements = []
 for line in lines:
-    source_path = line[0]
-    filename = source_path.split('/')[-1]
-    current_path = './data/IMG/' + filename
+    # create adjusted steering measurements for the side camera images
+    correction = 0.2
+    measurement_center = float(line[3])
+    measurement_left = measurement_center + 0.2
+    measurement_right = measurement_center - 0.2
+    measurement_tmp = [measurement_center, measurement_left, measurement_right]
+    
+    source_path_center = line[0]
+    source_path_left = line[1]
+    source_path_right = line[2]
+    filename_center = source_path_center.split('/')[-1]
+    filename_left = source_path_left.split('/')[-1]
+    filename_right = source_path_right.split('/')[-1]
+    path_center = './data/IMG/' + filename_center
+    path_left = './data/IMG/' + filename_left
+    path_right = './data/IMG/' + filename_right
+
     # image = cv2.imread(current_path)
-    image = ndimage.imread(current_path)
-    images.append(image)
-    measurement = float(line[3])
-    measurements.append(measurement)
+    image_center = ndimage.imread(path_center)
+    image_left = ndimage.imread(path_left)
+    image_right = ndimage.imread(path_right)
+    image_tmp = [image_center, image_left, image_right]
+
+    images.extend(image_tmp)
+    measurements.extend(measurement_tmp)
 
 augmented_images, augmented_measurements = [], []
 for image, measurement in zip(images, measurements):
